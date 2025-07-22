@@ -1,19 +1,27 @@
-import { createRouter as createTanstackRouter } from '@tanstack/react-router'
+import './styles.css'
 
+import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
+import { NotFound } from './components/NotFound'
+import { QueryClient } from '@tanstack/react-query'
+import { createRouter as createTanstackRouter } from '@tanstack/react-router'
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
-
-import './styles.css'
+import { routerWithQueryClient } from '@tanstack/react-router-with-query'
 
 // Create a new router instance
 export const createRouter = () => {
-  const router = createTanstackRouter({
-    routeTree,
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
-  })
+    const queryClient = new QueryClient()
 
-  return router
+  return routerWithQueryClient(
+    createTanstackRouter({
+      routeTree,
+      context: { queryClient },
+      defaultPreload: 'intent',
+      defaultErrorComponent: DefaultCatchBoundary,
+      defaultNotFoundComponent: () => <NotFound />,
+    }),
+    queryClient,
+  )
 }
 
 // Register the router instance for type safety
