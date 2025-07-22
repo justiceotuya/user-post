@@ -1,0 +1,19 @@
+{
+    "name": "user-post-monorepo",
+    "private": true,
+    "scripts": {
+        "install:all": "cd backend && yarn install && cd ../frontend && npm install",
+        "dev": "npm run dev:backend & npm run dev:frontend",
+        "dev:backend": "cd backend && node server.js",
+        "dev:frontend": "cd frontend && npx vite dev --port 3000",
+        "start": "npm run dev",
+        "backend": "cd backend && node server.js",
+        "frontend": "cd frontend && npm run dev",
+        "build": "cd frontend && npm run build",
+        "clean": "rm -rf backend/node_modules frontend/node_modules frontend/dist"
+    },
+    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+    "devDependencies": {
+        "concurrently": "^9.2.0"
+    }
+}
