@@ -6,6 +6,21 @@ export type User = {
   name: string
   email: string
 }
+
+export type TPagination = {
+currentPage:number
+endIndex:number
+hasNextPage:boolean
+hasPreviousPage:boolean
+itemsOnCurrentPage:number
+limit:number
+nextPage:number | null
+offset:number
+previousPage:null | number
+startIndex:number
+totalCount:number
+totalPages:number
+}
 export type UserWithAddress = User & {
   address: {
     street: string
@@ -14,14 +29,25 @@ export type UserWithAddress = User & {
     zipcode: string
   }
 }
+
+export type UsersResponse = {
+  data: UserWithAddress[]
+  pagination: TPagination
+}
+
+
 export const DEPLOY_URL = 'http://localhost:5003'
 
-export const usersQueryOptions = () =>
+export const usersQueryOptions = ({
+    currentPage = 1 ,
+    pageSize = 4,
+    } : { currentPage: number, pageSize: number }
+    ) =>
   queryOptions({
-    queryKey: ['users'],
+    queryKey: ['users', currentPage, pageSize],
     queryFn: () =>
       axios
-        .get<Array<UserWithAddress>>(DEPLOY_URL + '/users?limit=5')
+        .get<UsersResponse>(DEPLOY_URL + '/users?page=' + currentPage + '&limit=' + pageSize)
         .then((r) => r.data)
         .catch(() => {
           throw new Error('Failed to fetch users')
