@@ -2,18 +2,25 @@
     "name": "user-post-monorepo",
     "private": true,
     "scripts": {
-        "install:all": "cd backend && yarn install && cd ../frontend && npm install",
-        "dev": "npm run dev:backend & npm run dev:frontend",
-        "dev:backend": "cd backend && node server.js",
-        "dev:frontend": "cd frontend && npx vite dev --port 3000",
+        "install:all": "cd backend && npm install && cd ../frontend && npm install --legacy-peer-deps",
+        "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "dev:backend": "cd backend && npm run dev",
+        "dev:frontend": "cd frontend && npm run dev",
         "start": "npm run dev",
-        "backend": "cd backend && node server.js",
+        "backend": "cd backend && npm run dev",
         "frontend": "cd frontend && npm run dev",
-        "build": "cd frontend && npm run build",
-        "clean": "rm -rf backend/node_modules frontend/node_modules frontend/dist"
+        "build": "npm run build:backend && npm run build:frontend",
+        "build:backend": "cd backend && npm run build",
+        "build:frontend": "cd frontend && npm run build",
+        "start:prod": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run start:prod:backend\" \"npm run start:prod:frontend\"",
+        "start:prod:backend": "cd backend && npm start",
+        "start:prod:frontend": "cd frontend && npm run preview",
+        "type-check": "npm run type-check:backend",
+        "type-check:backend": "cd backend && npm run type-check",
+        "clean": "rm -rf backend/node_modules frontend/node_modules frontend/dist backend/dist"
     },
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
     "devDependencies": {
         "concurrently": "^9.2.0"
-    }
+    },
+    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
