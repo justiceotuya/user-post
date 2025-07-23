@@ -1,5 +1,6 @@
+import { PaginationResult, paginateQuery } from '../utils/pagination.js';
+
 import { Database } from 'sqlite3';
-import { paginateQuery, PaginationResult } from '../utils/pagination.js';
 
 export interface PostData {
   user_id: number;
@@ -8,12 +9,12 @@ export interface PostData {
 }
 
 export interface Post {
-  id: number;
-  user_id: number;
+  id: string;
   title: string;
   body: string;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  user: string;
+  email: string;
 }
 
 export interface CreatePostResult {
@@ -31,6 +32,16 @@ export interface DeleteResult {
   deleted: number;
 }
 
+interface PostRow {
+  id: number;
+  user_id: number;
+  title: string;
+  body: string;
+  created_at: string;
+  name: string;
+  email: string;
+}
+
 export class PostModel {
   private db: Database;
 
@@ -38,28 +49,97 @@ export class PostModel {
     this.db = db;
   }
 
-  // Get all posts with pagination
+  // Get all posts with user data and pagination
   async getAll(page: number = 1, limit: number = 10): Promise<PaginationResult<Post>> {
     const countQuery = 'SELECT COUNT(*) as total FROM posts';
-    const dataQuery = 'SELECT * FROM posts ORDER BY id LIMIT ? OFFSET ?';
-    
-    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit);
+    const dataQuery = `
+      SELECT
+        p.id,
+        p.title,
+        p.body,
+        p.created_at,
+        u.name,
+        u.email
+      FROM posts p
+      LEFT JOIN users u ON p.user_id = u.id
+      ORDER BY p.id
+      LIMIT ? OFFSET ?
+    `;
+
+    // Data transformer to format posts with user data
+    const postTransformer = (row: PostRow): Post => ({
+      id: row.id.toString(),
+      title: row.title,
+      body: row.body,
+      created_at: row.created_at || new Date().toISOString(),
+      user: row.name || 'Unknown User',
+      email: row.email || 'unknown@example.com'
+    });
+
+    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit, postTransformer);
   }
 
-  // Get posts by user ID with pagination
+  // Get posts by user ID with user data and pagination
   async getByUserId(userId: number, page: number = 1, limit: number = 10): Promise<PaginationResult<Post>> {
     const countQuery = 'SELECT COUNT(*) as total FROM posts WHERE user_id = ?';
-    const dataQuery = 'SELECT * FROM posts WHERE user_id = ? ORDER BY id LIMIT ? OFFSET ?';
-    
-    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [userId], [userId], page, limit);
+    const dataQuery = `
+      SELECT
+        p.id,
+        p.title,
+        p.body,
+        p.created_at,
+        u.name,
+        u.email
+      FROM posts p
+      LEFT JOIN users u ON p.user_id = u.id
+      WHERE p.user_id = ?
+      ORDER BY p.id
+      LIMIT ? OFFSET ?
+    `;
+
+    // Data transformer to format posts with user data
+    const postTransformer = (row: PostRow): Post => ({
+      id: row.id.toString(),
+      title: row.title,
+      body: row.body,
+      created_at: row.created_at || new Date().toISOString(),
+      user: row.name || 'Unknown User',
+      email: row.email || 'unknown@example.com'
+    });
+
+    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [userId], [userId], page, limit, postTransformer);
   }
 
-  // Get post by ID
+  // Get post by ID with user data
   async getById(id: number): Promise<Post | null> {
     return new Promise((resolve, reject) => {
-      this.db.get('SELECT * FROM posts WHERE id = ?', [id], (err: Error | null, row: Post) => {
+      const query = `
+        SELECT
+          p.id,
+          p.title,
+          p.body,
+          p.created_at,
+          u.name,
+          u.email
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        WHERE p.id = ?
+      `;
+
+      this.db.get(query, [id], (err: Error | null, row: PostRow) => {
         if (err) return reject(err);
-        resolve(row || null);
+        if (!row) return resolve(null);
+
+        const post: Post = {
+          id: row.id.toString(),
+          title: row.title,
+          body: row.body,
+          created_at: row.created_at || new Date().toISOString(),
+          user: row.name || 'Unknown User',
+          email: row.email || 'unknown@example.com'
+        };
+
+        resolve(post);
       });
     });
   }
@@ -68,9 +148,10 @@ export class PostModel {
   async create(postData: PostData): Promise<CreatePostResult> {
     return new Promise((resolve, reject) => {
       const { user_id, title, body } = postData;
-      const query = 'INSERT INTO posts (user_id, title, body) VALUES (?, ?, ?)';
-      
-      this.db.run(query, [user_id, title, body], function(err: Error | null) {
+      const query = 'INSERT INTO posts (user_id, title, body, created_at) VALUES (?, ?, ?, ?)';
+      const created_at = new Date().toISOString();
+
+      this.db.run(query, [user_id, title, body, created_at], function(err: Error | null) {
         if (err) return reject(err);
         resolve({ id: this.lastID, ...postData });
       });
@@ -82,7 +163,7 @@ export class PostModel {
     return new Promise((resolve, reject) => {
       const { title, body } = postData;
       const query = 'UPDATE posts SET title = ?, body = ? WHERE id = ?';
-      
+
       this.db.run(query, [title, body, id], function(err: Error | null) {
         if (err) return reject(err);
         resolve({ changes: this.changes });
