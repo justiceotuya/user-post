@@ -66,9 +66,18 @@ function UserComponent() {
                             <tbody>
                                 {users.map((user) => (
 
-                                    <tr key={user.id}
-                                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                                    <tr
+                                        key={user.id}
+                                        tabIndex={0}
+                                        role="button"
+                                        aria-label={`View posts for ${user.name}`}
+                                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer focus:outline-none focus:bg-gray-100"
                                         onClick={() => navigate({ to: "/users/$userId/posts", params: { userId: user.id } })}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                navigate({ to: "/users/$userId/posts", params: { userId: user.id } });
+                                            }
+                                        }}
                                     >
                                         <td className="py-[26px] px-6 font-medium text-sm text-gray-600">{user.name}</td>
                                         <td className="py-[26px] px-6 text-sm text-gray-600">{user.email}</td>

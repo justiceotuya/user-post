@@ -67,7 +67,7 @@ const Pagination = (props: PaginationProps) => {
                 }
 
                 return (
-                    <li
+                    <button
                         key={pageNumber}
                         className={classnames('w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 font-medium cursor-pointer', {
                             "text-[#7F56D9] bg-[#F9F5FF]": pageNumber === currentPage
@@ -75,7 +75,7 @@ const Pagination = (props: PaginationProps) => {
                         onClick={() => onPageChange(pageNumber as number)}
                     >
                         {pageNumber}
-                    </li>
+                    </button>
                 );
             })}
 

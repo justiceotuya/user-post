@@ -1,33 +1,21 @@
-import DeleteButton from '@/assets/svg/delete-button.svg';
+import AddCircle from '@/assets/svg/add-circle.svg';
 
-type Props = {
-    title: string
-    body: string
-    created_at: string
-    id: string
-}
-
-const PostCard = (props: Props) => {
+const NewPostCard = () => {
     return (
-        <div className='shadow-md rounded-lg p-6  bg-white hover:bg-gray-50 transition-colors duration-200 border border-gray-300
-        w-full relative
+        <button className=' rounded-lg p-6  bg-white border-dashed border-2 border-gray-300 hover:bg-gray-50 transition-colors duration-200
         '>
-            <button className='flex items-center justify-between w-6 h-6 absolute top-1 right-1 '>
+            <div className='flex flex-col items-center  '>
                 <img
-                    src={DeleteButton}
-                    alt="Delete Post"
-                    width={12}
-                    height={12}
+                    src={AddCircle}
+                    alt="New Post"
+                    width={24}
+                    height={24}
+                    className='mb-1.5'
                 />
-            </button>
-            <h2 className='font-medium text-lg mb-4 text-gray-600'>{props.title}</h2>
-            <div className="overflow-hidden h-full relative">
-                <p className="whitespace-normal break-words overflow-hidden text-ellipsis line-clamp-6">
-                    {props.body}
-                </p>
+                <p className='text-gray-500 text-sm'>New Post</p>
             </div>
-        </div>
+        </button>
     )
 }
 
-export default PostCard
+export default NewPostCard

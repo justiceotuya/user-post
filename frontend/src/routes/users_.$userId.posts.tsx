@@ -2,6 +2,7 @@ import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 
 import Arrow from '@/assets/svg/arrow.svg';
 import LoadingComponent from '@/components/loading-component'
+import NewPostCard from '@/components/new-post-card';
 import { NotFound } from '@/components/not-found';
 import Pagination from '@/components/pagination'
 import PostCard from '@/components/post-card';
@@ -72,6 +73,7 @@ function UserPostsComponent() {
                         <ul
                             className="grid gap-[23px] grid-cols-[repeat(auto-fit,minmax(270px,1fr))]"
                         >
+                            <NewPostCard />
                             {posts.map((post) => {
                                 return (
                                     <PostCard key={post.id} {...post} />
