@@ -1,6 +1,7 @@
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+
 import LoadingComponent from '@/components/loading-component'
 import Pagination from '@/components/pagination'
-import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { usersQueryOptions } from '@/utils/users'
@@ -32,6 +33,8 @@ interface User {
 }
 
 function UserComponent() {
+    const navigate = useNavigate();
+
     const [currentPage, setCurrentPage] = useState(1);
 
     const usersQuery = useSuspenseQuery(usersQueryOptions({
@@ -62,7 +65,11 @@ function UserComponent() {
                             </thead>
                             <tbody>
                                 {users.map((user) => (
-                                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+
+                                    <tr key={user.id}
+                                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => navigate({ to: "/users/$userId/posts", params: { userId: user.id } })}
+                                    >
                                         <td className="py-[26px] px-6 font-medium text-sm text-gray-600">{user.name}</td>
                                         <td className="py-[26px] px-6 text-sm text-gray-600">{user.email}</td>
                                         <td

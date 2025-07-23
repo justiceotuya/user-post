@@ -2,36 +2,47 @@ import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 
 import Arrow from '@/assets/svg/arrow.svg';
 import LoadingComponent from '@/components/loading-component'
+import { NotFound } from '@/components/not-found';
 import Pagination from '@/components/pagination'
 import PostCard from '@/components/post-card';
-import { postsQueryOptions } from '@/utils/posts'
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { userPostsQueryOptions } from '@/utils/posts'
 
 const pageSize = 10
-export const Route = createFileRoute('/posts')({
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(postsQueryOptions({
+export const Route = createFileRoute('/users_/$userId/posts')({
+    loader: async ({ context, params: { userId } }) => {
+        await context.queryClient.ensureQueryData(userPostsQueryOptions({
             currentPage: 1,
-            pageSize
+            pageSize,
+            userId,
         }))
     },
     head: () => ({
-        meta: [{ title: 'Posts' }],
+        meta: [{ title: 'Users Posts' }],
     }),
-    component: PostsComponent,
-    pendingComponent: () => <LoadingComponent title="Posts" />
+    component: UserPostsComponent,
+    pendingComponent: () => <LoadingComponent title="Users Posts" />,
+    notFoundComponent: () => {
+        return <NotFound>User not found</NotFound>
+    },
 })
 
-function PostsComponent() {
+function UserPostsComponent() {
+    const params = Route.useParams()
+    const userId = params.userId as string
+
     const [currentPage, setCurrentPage] = useState(1);
 
-    const postsQuery = useSuspenseQuery(postsQueryOptions({
+    const postsQuery = useSuspenseQuery(userPostsQueryOptions({
         currentPage,
-        pageSize
+        pageSize,
+        userId,
     }))
 
-    const posts = postsQuery.data?.data
+    const posts = postsQuery.data?.data.posts
+    const user = postsQuery.data?.data.user
+    const email = postsQuery.data?.data.email
 
 
     return (
@@ -47,13 +58,13 @@ function PostsComponent() {
                         width={20}
                         height={20}
                     />
-                    <span className="ml-1">  Back to Posts</span>
+                    <span className="ml-1">  Back to Users</span>
 
 
                 </Link>
-                <h1 className="text-6xl font-medium text-gray-900 mb-6">Posts</h1>
+                <h1 className="text-4xl font-medium text-gray-900 mb-6">{user}</h1>
                 <div className='flex justify-between items-center mb-4 text-gray-600'>
-                    <p><span>All Posts</span>    <span className='font-medium'>• {postsQuery.data?.pagination.totalCount || 0} Posts</span></p>
+                    <p><span>{email.toLowerCase()}</span>    <span className='font-medium'>• {postsQuery.data?.pagination.totalCount || 0} Posts</span></p>
                 </div>
                 <div className='rounded-xl bg-white  mt-4 '>
                     {/* <div className="overflow-x-auto"> */}

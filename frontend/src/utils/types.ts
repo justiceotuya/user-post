@@ -45,3 +45,12 @@ export type PostsResponse = {
   data: PostType[]
   pagination: TPagination
 }
+
+export type UserPostsResponse  = {
+  data: {
+    user: string;
+    email: string;
+    posts: PostType[];
+  };
+  pagination: TPagination;
+}
