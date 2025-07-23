@@ -107,7 +107,7 @@ export class UserModel {
   }
 
   // Get user by ID
-  async getById(id: number): Promise<User | null> {
+  async getById(id: string): Promise<User | null> {
     return new Promise((resolve, reject) => {
       const query = `
         SELECT

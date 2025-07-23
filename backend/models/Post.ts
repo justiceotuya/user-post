@@ -17,6 +17,17 @@ export interface Post {
   email: string;
 }
 
+export interface UserPostsData {
+  user: string;
+  email: string;
+  posts: Post[];
+}
+
+export interface UserPostsResult {
+  data: UserPostsData;
+  pagination: any; // Use your TPagination type here
+}
+
 export interface CreatePostResult {
   id: number;
   user_id: number;
@@ -79,35 +90,89 @@ export class PostModel {
     return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit, postTransformer);
   }
 
-  // Get posts by user ID with user data and pagination
-  async getByUserId(userId: number, page: number = 1, limit: number = 10): Promise<PaginationResult<Post>> {
-    const countQuery = 'SELECT COUNT(*) as total FROM posts WHERE user_id = ?';
-    const dataQuery = `
-      SELECT
-        p.id,
-        p.title,
-        p.body,
-        p.created_at,
-        u.name,
-        u.email
-      FROM posts p
-      LEFT JOIN users u ON p.user_id = u.id
-      WHERE p.user_id = ?
-      ORDER BY p.id
-      LIMIT ? OFFSET ?
-    `;
+  // Get posts by user ID with user data and pagination - Returns custom format
+  async getByUserId(userId: string, page: number = 1, limit: number = 10): Promise<UserPostsResult> {
+    return new Promise((resolve, reject) => {
+      // First get user info
+      const userQuery = 'SELECT name, email FROM users WHERE id = ?';
 
-    // Data transformer to format posts with user data
-    const postTransformer = (row: PostRow): Post => ({
-      id: row.id.toString(),
-      title: row.title,
-      body: row.body,
-      created_at: row.created_at || new Date().toISOString(),
-      user: row.name || 'Unknown User',
-      email: row.email || 'unknown@example.com'
+
+      this.db.get(userQuery, [userId], (userErr: Error | null, userRow: { name: string; email: string }) => {
+        if (userErr) return reject(userErr);
+        if (!userRow) return reject(new Error('User not found'));
+
+        // Then get paginated posts
+        const countQuery = 'SELECT COUNT(*) as total FROM posts WHERE user_id = ?';
+        const dataQuery = `
+          SELECT
+            p.id,
+            p.title,
+            p.body,
+            p.created_at,
+            u.name,
+            u.email
+          FROM posts p
+          LEFT JOIN users u ON p.user_id = u.id
+          WHERE p.user_id = ?
+          ORDER BY p.id
+          LIMIT ? OFFSET ?
+        `;
+
+        // Calculate pagination
+        const offset = (page - 1) * limit;
+
+        // Get total count
+        this.db.get(countQuery, [userId], (countErr: Error | null, countRow: { total: number }) => {
+          if (countErr) return reject(countErr);
+
+          const totalCount = countRow.total;
+          const totalPages = Math.ceil(totalCount / limit);
+
+          // Get posts data
+          this.db.all(dataQuery, [userId, limit, offset], (postsErr: Error | null, postsRows: PostRow[]) => {
+            if (postsErr) return reject(postsErr);
+
+            // Transform posts data
+            const posts: Post[] = postsRows.map((row: PostRow) => ({
+              id: row.id.toString(),
+              title: row.title,
+              body: row.body,
+              created_at: row.created_at || new Date().toISOString(),
+              user: row.name || 'Unknown User',
+              email: row.email || 'unknown@example.com'
+            }));
+
+            // Create pagination metadata
+            const pagination = {
+              currentPage: page,
+              totalPages: totalPages,
+              totalCount: totalCount,
+              limit: limit,
+              offset: offset,
+              hasNextPage: page < totalPages,
+              hasPreviousPage: page > 1,
+              nextPage: page < totalPages ? page + 1 : null,
+              previousPage: page > 1 ? page - 1 : null,
+              itemsOnCurrentPage: posts.length,
+              startIndex: offset + 1,
+              endIndex: offset + posts.length
+            };
+
+            // Return custom format
+            const result: UserPostsResult = {
+              data: {
+                user: userRow.name,
+                email: userRow.email,
+                posts: posts
+              },
+              pagination: pagination
+            };
+
+            resolve(result);
+          });
+        });
+      });
     });
-
-    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [userId], [userId], page, limit, postTransformer);
   }
 
   // Get post by ID with user data

@@ -28,16 +28,10 @@ export class PostController {
   async getPostsByUserId(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const userIdNumber: number = parseInt(userId);
       const page: number = parseInt(req.query.page as string) || 1;
       const limit: number = parseInt(req.query.limit as string) || 10;
 
-      if (isNaN(userIdNumber)) {
-        res.status(400).json({ error: 'Invalid user ID' });
-        return;
-      }
-
-      const result = await this.postModel.getByUserId(userIdNumber, page, limit);
+      const result = await this.postModel.getByUserId(userId, page, limit);
       res.json(result);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
