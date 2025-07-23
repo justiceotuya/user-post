@@ -1,10 +1,12 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { postsQueryOptions, useDeletePostMutation } from '@/utils/posts'
 
 import Arrow from '@/assets/svg/arrow.svg';
 import LoadingComponent from '@/components/loading-component'
 import Pagination from '@/components/pagination'
 import PostCard from '@/components/post-card';
-import { postsQueryOptions } from '@/utils/posts'
+import { queryClient } from '@/router';
+import toast from 'react-hot-toast';
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
@@ -32,6 +34,31 @@ function PostsComponent() {
     }))
 
     const posts = postsQuery.data?.data
+
+    const { mutate: deletePost } = useDeletePostMutation()
+
+    const handleDeletePost = (id: string) => {
+        toast.promise(
+            new Promise<void>((resolve, reject) => {
+                deletePost(id, {
+                    onSuccess: () => {
+                        //invalidate the posts query to refetch the posts
+                        queryClient.invalidateQueries({
+                            queryKey: ['posts']
+                        });
+
+                        resolve()
+                    },
+                    onError: (error) => reject(error),
+                });
+            }),
+            {
+                loading: 'Waiting...',
+                success: 'Post deleted successfully',
+                error: (err: any) => `Failed to delete post`,
+            }
+        );
+    }
 
 
     return (
@@ -63,7 +90,7 @@ function PostsComponent() {
                         >
                             {posts.map((post) => {
                                 return (
-                                    <PostCard key={post.id} {...post} />
+                                    <PostCard key={post.id} {...post} handleDeletePost={handleDeletePost} />
                                 )
                             })}
                         </ul>
