@@ -123,14 +123,9 @@ export class PostController {
   async deletePost(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
-      const postIdNumber: number = parseInt(postId);
 
-      if (isNaN(postIdNumber)) {
-        res.status(400).json({ error: 'Invalid post ID' });
-        return;
-      }
 
-      const result = await this.postModel.delete(postIdNumber);
+      const result = await this.postModel.delete(postId);
 
       if (result.deleted === 0) {
         res.status(404).json({ error: 'Post not found' });

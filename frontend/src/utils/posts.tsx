@@ -1,7 +1,7 @@
 import type { PostsResponse, UserPostsResponse } from './types'
+import { queryOptions, useMutation } from '@tanstack/react-query'
 
 import axios from 'redaxios'
-import { queryOptions } from '@tanstack/react-query'
 
 export const BASE_URL = 'http://localhost:5003'
 
@@ -39,3 +39,17 @@ export const userPostsQueryOptions = (
                     throw new Error('Failed to fetch users posts')
                 }),
     })
+
+
+
+export const useDeletePostMutation = () => {
+    return useMutation({
+        mutationFn: (postId: string) =>
+            axios
+                .delete(BASE_URL + '/posts/' + postId)
+                .then((r) => r.data)
+                .catch(() => {
+                    throw new Error('Failed to delete post')
+                }),
+    });
+}

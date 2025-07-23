@@ -1,4 +1,5 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { useDeletePostMutation, userPostsQueryOptions } from '@/utils/posts'
 
 import Arrow from '@/assets/svg/arrow.svg';
 import LoadingComponent from '@/components/loading-component'
@@ -6,9 +7,11 @@ import NewPostCard from '@/components/new-post-card';
 import { NotFound } from '@/components/not-found';
 import Pagination from '@/components/pagination'
 import PostCard from '@/components/post-card';
+import { queryClient } from '@/router';
+import { queryOptions } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { userPostsQueryOptions } from '@/utils/posts'
 
 const pageSize = 10
 export const Route = createFileRoute('/users_/$userId/posts')({
@@ -46,6 +49,34 @@ function UserPostsComponent() {
     const email = postsQuery.data?.data.email
 
 
+    const { mutate: deletePost } = useDeletePostMutation()
+
+    const handleDeletePost = (id: string) => {
+        toast.promise(
+            new Promise<void>((resolve, reject) => {
+                deletePost(id, {
+                    onSuccess: () => {
+                        //invalidate the posts query to refetch the posts
+                        queryClient.invalidateQueries({
+                            queryKey: ['posts']
+                        });
+                        queryClient.invalidateQueries({
+                            queryKey: ['posts', userId]
+                        });
+                        resolve()
+                    },
+                    onError: (error) => reject(error),
+                });
+            }),
+            {
+                loading: 'Waiting...',
+                success: 'Post deleted successfully',
+                error: (err: any) => `Failed to delete post`,
+            }
+        );
+    }
+
+
     return (
         <main>
             <div className='max-w-[856px] mx-auto my-10 lg:mt-32 px-4 w-full lg:px-0'>
@@ -71,12 +102,12 @@ function UserPostsComponent() {
                     {/* <div className="overflow-x-auto"> */}
                     <div className="flex ">
                         <ul
-                            className="grid gap-[23px] grid-cols-[repeat(auto-fit,minmax(270px,1fr))]"
+                            className="grid gap-[23px] grid-cols-[repeat(auto-fill,minmax(270px,1fr))]"
                         >
-                            <NewPostCard />
+                            {currentPage === 1 && <NewPostCard />}
                             {posts.map((post) => {
                                 return (
-                                    <PostCard key={post.id} {...post} />
+                                    <PostCard key={post.id} {...post} handleDeletePost={handleDeletePost} />
                                 )
                             })}
                         </ul>

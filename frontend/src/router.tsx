@@ -9,8 +9,8 @@ import { routeTree } from './routeTree.gen'
 import { routerWithQueryClient } from '@tanstack/react-router-with-query'
 
 // Create a new router instance
+export const queryClient = new QueryClient()
 export const createRouter = () => {
-    const queryClient = new QueryClient()
 
   return routerWithQueryClient(
     createTanstackRouter({
@@ -23,6 +23,8 @@ export const createRouter = () => {
     queryClient,
   )
 }
+
+
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {

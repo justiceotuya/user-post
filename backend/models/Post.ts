@@ -237,7 +237,7 @@ export class PostModel {
   }
 
   // Delete a post
-  async delete(id: number): Promise<DeleteResult> {
+  async delete(id: string): Promise<DeleteResult> {
     return new Promise((resolve, reject) => {
       this.db.run('DELETE FROM posts WHERE id = ?', [id], function(err: Error | null) {
         if (err) return reject(err);

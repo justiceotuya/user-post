@@ -69,7 +69,7 @@ const Pagination = (props: PaginationProps) => {
                 return (
                     <button
                         key={pageNumber}
-                        className={classnames('w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 font-medium cursor-pointer', {
+                        className={classnames('w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 font-medium cursor-pointer hover:bg-gray-100 ', {
                             "text-[#7F56D9] bg-[#F9F5FF]": pageNumber === currentPage
                         })}
                         onClick={() => onPageChange(pageNumber as number)}

@@ -5,14 +5,17 @@ type Props = {
     body: string
     created_at: string
     id: string
+    handleDeletePost: (id: string) => void
 }
 
 const PostCard = (props: Props) => {
+    const { id, title, body, created_at, handleDeletePost } = props;
+
     return (
         <div className='shadow-md rounded-lg p-6  bg-white hover:bg-gray-50 transition-colors duration-200 border border-gray-300
         w-full relative
         '>
-            <button className='flex items-center justify-center w-6 h-6 absolute top-1 right-1 hover:opacity-80 transition-opacity duration-200 cursor-pointer'>
+            <button className='flex items-center justify-center w-6 h-6 absolute top-1 right-1 hover:opacity-80 transition-opacity duration-200 cursor-pointer' onClick={() => handleDeletePost(id)}>
                 <img
                     src={DeleteButton}
                     alt="Delete Post"
