@@ -1,7 +1,7 @@
 import './styles.css'
 
-import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
-import { NotFound } from './components/NotFound'
+import { DefaultCatchBoundary } from './components/default-catch-boundary'
+import { NotFound } from './components/not-found'
 import { QueryClient } from '@tanstack/react-query'
 import { createRouter as createTanstackRouter } from '@tanstack/react-router'
 // Import the generated route tree

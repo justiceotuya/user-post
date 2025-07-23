@@ -1,5 +1,5 @@
-import Pagination from '@/components/Pagination'
-import UsersLoadingComponent from '@/components/UsersLoadingComponent'
+import LoadingComponent from '@/components/loading-component'
+import Pagination from '@/components/pagination'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -12,10 +12,11 @@ export const Route = createFileRoute('/users')({
             pageSize: 4
         }))
     },
-    pendingComponent: () => (
-        <UsersLoadingComponent />
-    ),
+    pendingComponent: () => <LoadingComponent title="Users" />,
     component: UserComponent,
+    head: () => ({
+        meta: [{ title: 'Users' }],
+    }),
 })
 
 interface User {
@@ -65,14 +66,7 @@ function UserComponent() {
                                         <td className="py-[26px] px-6 font-medium text-sm text-gray-600">{user.name}</td>
                                         <td className="py-[26px] px-6 text-sm text-gray-600">{user.email}</td>
                                         <td
-                                            className="py-[26px] px-6 text-sm text-gray-600 truncate"
-                                            style={{
-                                                width: '392px',
-                                                maxWidth: '392px',
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                            }}
+                                            className="py-[26px] px-6 text-sm text-gray-600 truncate max-w-[392px] w-[392px] whitespace-nowrap overflow-hidden text-ellipsis"
                                             title={formatAddress(user.address)}
                                         >
                                             {formatAddress(user.address)}

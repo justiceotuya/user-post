@@ -9,7 +9,6 @@ export type PaginationProps = {
     siblingCount?: number;
     currentPage: number;
     pageSize: number;
-    className?: string;
 };
 
 
@@ -20,7 +19,6 @@ const Pagination = (props: PaginationProps) => {
         siblingCount = 1,
         currentPage,
         pageSize,
-        className
     } = props;
 
     const paginationRange = usePagination({
@@ -45,10 +43,10 @@ const Pagination = (props: PaginationProps) => {
     let lastPage = paginationRange && paginationRange[paginationRange.length - 1];
     return (
         <ul
-            className="flex flex-row items-center justify-center gap-2 pagination"
+            className="flex flex-row items-center justify-center gap-2 flex-wrap "
         >
             <button
-                className={classnames('flex flex-row gap-2 text-gray-600 items-center font-semibold text-sm mr-[42px] cursor-pointer disabled:opacity-40')}
+                className={classnames('flex flex-row gap-2 text-gray-600 items-center font-semibold text-sm mr-[10px] lg:mr-[42px] cursor-pointer disabled:opacity-40')}
                 disabled={currentPage === 1}
                 aria-label="Previous Page"
                 type="button"
@@ -83,7 +81,7 @@ const Pagination = (props: PaginationProps) => {
 
 
             <button
-                className={classnames('flex flex-row gap-2 text-gray-600 items-center font-semibold text-sm ml-[42px] cursor-pointer disabled:opacity-40')}
+                className={classnames('flex flex-row gap-2 text-gray-600 items-center font-semibold text-sm ml-[10px] lg:ml-[42px]  cursor-pointer disabled:opacity-40')}
                 disabled={currentPage === lastPage}
                 aria-label="Previous Page"
                 type="button"
