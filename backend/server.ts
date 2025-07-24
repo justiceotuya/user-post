@@ -141,18 +141,6 @@ const testDatabase = async (): Promise<void> => {
   }
 };
 
-// API routes with configurable prefix
-app.use(config.api.prefix, (req, res, next) => {
-  if (!db) {
-    return res.status(503).json({
-      error: 'Service Unavailable',
-      message: 'Database not initialized',
-      timestamp: new Date().toISOString()
-    });
-  }
-  createRoutes(db)(req, res, next);
-});
-
 // Health check endpoint
 app.get('/health', async (req: Request, res: Response): Promise<void> => {
   try {
@@ -231,6 +219,9 @@ process.on('SIGINT', gracefulShutdown);
 const startServer = async (): Promise<void> => {
   try {
     await testDatabase();
+
+    // API routes with configurable prefix (after db is initialized)
+    app.use(config.api.prefix, createRoutes(db));
 
     app.listen(config.port, (): void => {
       console.log(`🚀 Server running on http://localhost:${config.port}`);
