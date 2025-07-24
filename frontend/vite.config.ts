@@ -7,26 +7,18 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 const config = defineConfig({
   plugins: [
     // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
+    // viteTsConfigPaths({
+    //   projects: ['./tsconfig.json'],
+    // }),
     tailwindcss(),
     tanstackStart(),
   ],
   resolve: {
-    // alias: {
-    //   "@": path.resolve(__dirname, "./src"),
-    // },
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
   },
-  build: {
-    rollupOptions: {
-      external: [],
-      output: {
-        manualChunks: undefined,
-      }
-    }
-  }
+
 })
 
 export default config
