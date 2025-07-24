@@ -3,7 +3,7 @@ import type { UserWithAddress, UsersResponse } from './types'
 import axios from 'redaxios'
 import { queryOptions } from '@tanstack/react-query'
 
-export const DEPLOY_URL = 'http://localhost:5003'
+export const DEPLOY_URL = import.meta.env.VITE_DEPLOY_URL
 
 export const usersQueryOptions = ({
   currentPage = 1,
