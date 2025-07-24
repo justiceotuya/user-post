@@ -13,6 +13,19 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
   ],
+    resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    }
+  },
+  build: {
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: undefined,
+      }
+    }
+  }
 })
 
 export default config
