@@ -175,26 +175,6 @@ app.get('/health', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// 404 handler
-app.use('*', (req: Request, res: Response): void => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Route ${req.originalUrl} not found`,
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-  console.error('❌ Error:', err.message);
-
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: config.nodeEnv === 'development' ? err.message : 'Something went wrong',
-    timestamp: new Date().toISOString()
-  });
-});
-
 // Graceful shutdown
 const gracefulShutdown = () => {
   console.log('🛑 Shutting down gracefully...');
@@ -222,6 +202,26 @@ const startServer = async (): Promise<void> => {
 
     // API routes with configurable prefix (after db is initialized)
     app.use(config.api.prefix, createRoutes(db));
+
+    // 404 handler - MUST come after all other routes
+    app.use('*', (req: Request, res: Response): void => {
+      res.status(404).json({
+        error: 'Not Found',
+        message: `Route ${req.originalUrl} not found`,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Error handling middleware - MUST be last
+    app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
+      console.error('❌ Error:', err.message);
+
+      res.status(500).json({
+        error: 'Internal Server Error',
+        message: config.nodeEnv === 'development' ? err.message : 'Something went wrong',
+        timestamp: new Date().toISOString()
+      });
+    });
 
     app.listen(config.port, (): void => {
       console.log(`🚀 Server running on http://localhost:${config.port}`);
