@@ -87,7 +87,7 @@ export class PostModel {
       email: row.email || 'unknown@example.com'
     });
 
-    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit, postTransformer);
+    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit, postTransformer, 'posts');
   }
 
   // Get posts by user ID with user data and pagination - Returns custom format

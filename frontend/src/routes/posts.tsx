@@ -33,7 +33,7 @@ export function PostsComponent() {
         pageSize
     }))
 
-    const posts = postsQuery.data?.data
+    const posts = postsQuery.data?.posts
 
     const { mutate: deletePost } = useDeletePostMutation()
 

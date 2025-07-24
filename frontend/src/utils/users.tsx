@@ -21,10 +21,6 @@ export const usersQueryOptions = ({
         .catch(() => {
           throw new Error('Failed to fetch users')
         }),
-    select: (data) => ({
-      ...data,
-      data: [...data.data].sort((a, b) => a.name.localeCompare(b.name)),
-    }),
   })
 
 export const userQueryOptions = (id: string) =>

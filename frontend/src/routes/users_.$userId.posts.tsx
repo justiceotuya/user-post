@@ -43,6 +43,8 @@ function UserPostsComponent() {
         userId,
     }))
 
+    console.log(postsQuery.data);
+
     const posts = postsQuery.data?.data.posts
     const user = postsQuery.data?.data.user
     const email = postsQuery.data?.data.email

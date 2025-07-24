@@ -20,7 +20,7 @@ totalCount:number
 totalPages:number
 }
 export type UserWithAddress = User & {
-  address: {
+  addresses: {
     street: string
     city: string
     state: string
@@ -29,7 +29,7 @@ export type UserWithAddress = User & {
 }
 
 export type UsersResponse = {
-  data: UserWithAddress[]
+  users: UserWithAddress[]
   pagination: TPagination
 }
 
@@ -43,7 +43,7 @@ export type PostType = {
 }
 
 export type PostsResponse = {
-  data: PostType[]
+  posts: PostType[]
   pagination: TPagination
 }
 

@@ -82,7 +82,8 @@ export function paginateQuery<T>(
   dataParams: any[] = [],
   page: number = 1,
   limit: number = 10,
-  dataTransformer?: (row: any) => T
+    dataTransformer?: (row: any) => T,
+  dataName?:string
 ): Promise<PaginationResult<T>> {
   return new Promise((resolve, reject) => {
     // First get the total count
@@ -91,25 +92,29 @@ export function paginateQuery<T>(
 
       const totalCount = countRow.total;
       const pagination = createPaginationMeta(page, limit, totalCount);
-      
+
       // Add limit and offset to data query parameters
       const finalDataParams = [...dataParams, pagination.queryParams.limit, pagination.queryParams.offset];
-      
+
       // Execute the data query
       db.all(dataQuery, finalDataParams, (err: Error | null, rows: any[]) => {
         if (err) return reject(err);
 
         // Transform data if transformer function is provided
         const data: T[] = dataTransformer ? rows.map(dataTransformer) : rows;
-        
+
         // Update actual items count in metadata
         pagination.metadata.itemsOnCurrentPage = data.length;
-        pagination.metadata.endIndex = pagination.metadata.offset + data.length;
+          pagination.metadata.endIndex = pagination.metadata.offset + data.length;
 
-        resolve({
-          data: data || [],
-          pagination: pagination.metadata
-        });
+        let result:any = {}
+
+          const nameOfData = dataName || 'data';
+           result[nameOfData] = data || []
+           result.pagination = pagination.metadata
+
+
+        resolve(result);
       });
     });
   });

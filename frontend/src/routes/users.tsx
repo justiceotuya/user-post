@@ -42,7 +42,9 @@ export function UserComponent() {
         currentPage,
         pageSize
     }))
-    const users = usersQuery.data?.data
+    const users = usersQuery.data?.users
+    console.log(usersQuery.data);
+
 
     const formatAddress = (address?: User['address']) => {
         if (!address) return 'N/A'
@@ -84,9 +86,9 @@ export function UserComponent() {
                                         <td className="py-[26px] px-6 text-sm text-gray-600">{user.email}</td>
                                         <td
                                             className="py-[26px] px-6 text-sm text-gray-600 truncate max-w-[392px] w-[392px] whitespace-nowrap overflow-hidden text-ellipsis"
-                                            title={formatAddress(user.address)}
+                                            title={formatAddress(user.addresses)}
                                         >
-                                            {formatAddress(user.address)}
+                                            {formatAddress(user.addresses)}
                                         </td>
                                     </tr>
                                 ))}

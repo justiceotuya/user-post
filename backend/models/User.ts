@@ -22,7 +22,7 @@ export interface User {
   username: string;
   email: string;
   phone?: string;
-  address?: Address | null;
+  addresses?: Address | null;
 }
 
 export interface CreateUserResult {
@@ -95,7 +95,7 @@ export class UserModel {
       username: row.username,
       email: row.email,
       phone: row.phone,
-      address:  {
+      addresses:  {
         street: row.street,
         state: row.state,
         city: row.city,
@@ -103,7 +103,7 @@ export class UserModel {
       }
     });
 
-    return await paginateQuery<User>(this.db, countQuery, dataQuery, [], [], page, limit, userTransformer);
+    return await paginateQuery<User>(this.db, countQuery, dataQuery, [], [], page, limit, userTransformer, 'users');
   }
 
   // Get user by ID
@@ -135,7 +135,7 @@ export class UserModel {
           username: row.username,
           email: row.email,
           phone: row.phone,
-          address:{
+          addresses:{
             street: row.street,
             state: row.state,
             city: row.city,
