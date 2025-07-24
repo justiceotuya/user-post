@@ -1,3 +1,4 @@
+import { existsSync, mkdirSync } from 'fs';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { getDatabaseInfo, initializeDatabase, validateDatabaseSchema } from './database/init.js';
 import sqlite3, { Database } from 'sqlite3';
@@ -14,19 +15,68 @@ dotenv.config({ path: resolve(process.cwd(), '../.env') });
 
 const app: Application = express();
 
-// Create absolute path for database
-const dbPath = path.resolve(config.database.path);
-console.log(`📁 Using database file: ${dbPath}`);
+// Create absolute path for database and ensure directory exists
+const ensureDatabaseDirectory = (dbPath: string): string => {
+  const absolutePath = path.resolve(dbPath);
+  const directory = path.dirname(absolutePath);
 
-// Initialize database connection
-const db: Database = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('❌ Failed to open database:', err.message);
-    console.error('📍 Database path:', dbPath);
-    process.exit(1);
+  console.log(`📁 Database directory: ${directory}`);
+  console.log(`📄 Database file: ${absolutePath}`);
+
+  try {
+    if (!existsSync(directory)) {
+      console.log(`📁 Creating database directory: ${directory}`);
+      mkdirSync(directory, { recursive: true });
+      console.log(`✅ Database directory created successfully`);
+    } else {
+      console.log(`✅ Database directory already exists`);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to create database directory:`, error);
+    throw error;
   }
-  console.log('✅ Database file opened successfully');
-});
+
+  return absolutePath;
+};
+
+const dbPath = ensureDatabaseDirectory(config.database.path);
+
+// Initialize database connection with better error handling
+let db: Database;
+
+const createDatabaseConnection = (): Promise<Database> => {
+  return new Promise((resolve, reject) => {
+    console.log(`🔌 Connecting to database at: ${dbPath}`);
+
+    const database = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+      if (err) {
+        console.error('❌ Database connection failed:', err.message);
+        console.error('📍 Attempted path:', dbPath);
+
+        // Try to create with just OPEN_CREATE flag as fallback
+        const fallbackDb = new sqlite3.Database(dbPath, sqlite3.OPEN_CREATE, (fallbackErr) => {
+          if (fallbackErr) {
+            console.error('❌ Fallback database creation failed:', fallbackErr.message);
+            reject(fallbackErr);
+            return;
+          }
+
+          console.log('✅ Database created successfully (fallback method)');
+          resolve(fallbackDb);
+        });
+        return;
+      }
+
+      console.log('✅ Database connection established');
+      resolve(database);
+    });
+
+    // Handle database errors
+    database.on('error', (err) => {
+      console.error('❌ Database error:', err);
+    });
+  });
+};
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
@@ -65,12 +115,15 @@ if (config.nodeEnv === 'development') {
 // Test database connection and check schema
 const testDatabase = async (): Promise<void> => {
   try {
-    console.log('🗄️ Testing existing database...');
+    console.log('🗄️ Initializing database connection...');
+
+    // Create database connection
+    db = await createDatabaseConnection();
 
     // Test basic connection
     await initializeDatabase(db);
 
-    // Check what tables exist
+    // Check what tables exist and create if needed
     await validateDatabaseSchema(db);
 
     // Log database info in development
@@ -80,20 +133,38 @@ const testDatabase = async (): Promise<void> => {
       console.log(`📋 Available tables: ${dbInfo.tables.join(', ')}`);
     }
 
-    console.log('✅ Database test completed successfully');
+    console.log('✅ Database initialization completed successfully');
   } catch (error) {
-    console.error('❌ Database test failed:', error);
+    console.error('❌ Database initialization failed:', error);
     console.error('💡 Please check your database file path and permissions');
     process.exit(1);
   }
 };
 
 // API routes with configurable prefix
-app.use(config.api.prefix, createRoutes(db));
+app.use(config.api.prefix, (req, res, next) => {
+  if (!db) {
+    return res.status(503).json({
+      error: 'Service Unavailable',
+      message: 'Database not initialized',
+      timestamp: new Date().toISOString()
+    });
+  }
+  createRoutes(db)(req, res, next);
+});
 
 // Health check endpoint
 app.get('/health', async (req: Request, res: Response): Promise<void> => {
   try {
+    if (!db) {
+      res.status(503).json({
+        status: 'ERROR',
+        message: 'Database not initialized',
+        timestamp: new Date().toISOString()
+      });
+      return;
+    }
+
     const dbInfo = await getDatabaseInfo(db);
     res.json({
       status: 'OK',
@@ -139,14 +210,18 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
 // Graceful shutdown
 const gracefulShutdown = () => {
   console.log('🛑 Shutting down gracefully...');
-  db.close((err) => {
-    if (err) {
-      console.error('❌ Error closing database:', err.message);
-    } else {
-      console.log('✅ Database connection closed.');
-    }
+  if (db) {
+    db.close((err) => {
+      if (err) {
+        console.error('❌ Error closing database:', err.message);
+      } else {
+        console.log('✅ Database connection closed.');
+      }
+      process.exit(0);
+    });
+  } else {
     process.exit(0);
-  });
+  }
 };
 
 process.on('SIGTERM', gracefulShutdown);
