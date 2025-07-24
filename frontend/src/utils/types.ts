@@ -1,7 +1,8 @@
 export type User = {
-  id: number
+  id: string
   name: string
   email: string
+  username: string
 }
 
 export type TPagination = {

@@ -25,7 +25,7 @@ export const Route = createFileRoute('/posts')({
     pendingComponent: () => <LoadingComponent title="Posts" />
 })
 
-function PostsComponent() {
+export function PostsComponent() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const postsQuery = useSuspenseQuery(postsQueryOptions({

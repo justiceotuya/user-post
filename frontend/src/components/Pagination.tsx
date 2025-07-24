@@ -41,9 +41,11 @@ const Pagination = (props: PaginationProps) => {
     };
 
     let lastPage = paginationRange && paginationRange[paginationRange.length - 1];
+
     return (
         <ul
             className="flex flex-row items-center justify-center gap-2 flex-wrap "
+            data-testid="pagination"
         >
             <button
                 className={classnames('flex flex-row gap-2 text-gray-600 items-center font-semibold text-sm mr-[10px] lg:mr-[42px] cursor-pointer disabled:opacity-40')}
