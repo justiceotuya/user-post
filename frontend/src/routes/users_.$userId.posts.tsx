@@ -5,10 +5,9 @@ import Arrow from '@/assets/svg/arrow.svg';
 import LoadingComponent from '@/components/loading-component'
 import NewPostCard from '@/components/new-post-card';
 import { NotFound } from '@/components/not-found';
-import Pagination from '@/components/pagination'
+import Pagination from '@/components/paginations'
 import PostCard from '@/components/post-card';
 import { queryClient } from '@/router';
-import { queryOptions } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'

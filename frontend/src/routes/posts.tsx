@@ -3,7 +3,7 @@ import { postsQueryOptions, useDeletePostMutation } from '@/utils/posts'
 
 import Arrow from '@/assets/svg/arrow.svg';
 import LoadingComponent from '@/components/loading-component'
-import Pagination from '@/components/pagination'
+import Pagination from '@/components/paginations';
 import PostCard from '@/components/post-card';
 import { queryClient } from '@/router';
 import toast from 'react-hot-toast';

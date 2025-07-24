@@ -1,7 +1,7 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 
 import LoadingComponent from '@/components/loading-component'
-import Pagination from '@/components/pagination'
+import Pagination from '@/components/paginations'
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { usersQueryOptions } from '@/utils/users'
