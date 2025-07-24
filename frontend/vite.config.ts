@@ -13,11 +13,6 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
   ],
-  resolve: {
-    alias: {
-      "@": path.resolve(process.cwd(), "src"),
-    }
-  }
 })
 
 export default config
