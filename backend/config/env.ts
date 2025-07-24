@@ -32,8 +32,8 @@ const backendConfig: BackendConfig = {
   nodeEnv: process.env.NODE_ENV || 'development',
   database: {
     // Use './data.db' instead of './backend/data.db' since we're already in the backend directory
-    path: process.env.DATABASE_PATH || './data.db',
-    url: process.env.DATABASE_URL || 'sqlite://./data.db',
+    path: process.env.DATABASE_PATH || './var/data/data.db',
+    url: process.env.DATABASE_URL || 'sqlite://./var/data/data.db',
   },
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
