@@ -63,7 +63,7 @@ export class UserModel {
   // Get all users with pagination
   async getAll(page: number = 1, limit: number = 10): Promise<PaginationResult<User>> {
     const countQuery = 'SELECT COUNT(*) as total FROM users';
-    const dataQuery = 'SELECT * FROM users ORDER BY id LIMIT ? OFFSET ?';
+    const dataQuery = 'SELECT * FROM users ORDER BY name LIMIT ? OFFSET ?';
 
     return await paginateQuery<User>(this.db, countQuery, dataQuery, [], [], page, limit);
   }
@@ -84,7 +84,7 @@ export class UserModel {
         a.zipcode
       FROM users u
       LEFT JOIN addresses a ON u.id = a.user_id
-      ORDER BY u.id
+      ORDER BY u.name
       LIMIT ? OFFSET ?
     `;
 

@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: user-post-backend-dev
+    ports:
+      - "5003:5003"
+    environment:
+      - NODE_ENV=development
+      - PORT=5003
+      - DATABASE_PATH=./var/data/data.db
+      - CORS_ORIGIN=http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_data_dev:/app/var/data
+    networks:
+      - user-post-dev-network
+    command: npm run dev
+
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: user-post-frontend-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:5003
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - user-post-dev-network
+    command: npm run dev
+
+networks:
+  user-post-dev-network:
+    driver: bridge
+
+volumes:
+  backend_data_dev:
+    driver: local

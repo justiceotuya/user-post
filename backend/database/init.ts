@@ -2,9 +2,9 @@ import { Database } from 'sqlite3';
 
 export const initializeDatabase = (db: Database): Promise<void> => {
   return new Promise((resolve, reject) => {
-    console.log('🔌 Testing database connection...');
+    console.log('🔌 Testing existing database connection...');
 
-    // Simple connection test - just run a basic query
+    // Simple connection test - just verify we can query
     db.get("SELECT 1 as test", (err: Error | null, row: any) => {
       if (err) {
         console.error('❌ Database connection test failed:', err.message);
@@ -32,12 +32,14 @@ export const validateDatabaseSchema = (db: Database): Promise<void> => {
       const existingTables = tables.map(table => table.name);
       console.log(`📊 Found ${existingTables.length} table(s): ${existingTables.join(', ')}`);
 
+      // Just log what we found, don't create anything
+      console.log('✅ Using existing database schema');
       resolve();
     });
   });
 };
 
-export const getDatabaseInfo = (db: Database): Promise<{ tables: string[], version: string }> => {
+export const getDatabaseInfo = (db: Database): Promise<{ tables: string[], version: string, userCount?: number }> => {
   return new Promise((resolve, reject) => {
     db.get("SELECT sqlite_version() as version", (versionErr: Error | null, versionRow: any) => {
       if (versionErr) {
@@ -51,10 +53,23 @@ export const getDatabaseInfo = (db: Database): Promise<{ tables: string[], versi
           return;
         }
 
-        resolve({
-          version: versionRow.version,
-          tables: tables.map(table => table.name)
-        });
+        const tableNames = tables.map(table => table.name);
+
+        // Try to get user count if users table exists
+        if (tableNames.includes('users')) {
+          db.get('SELECT COUNT(*) as count FROM users', (countErr: Error | null, countRow: { count: number }) => {
+            resolve({
+              version: versionRow.version,
+              tables: tableNames,
+              userCount: countErr ? undefined : countRow.count
+            });
+          });
+        } else {
+          resolve({
+            version: versionRow.version,
+            tables: tableNames
+          });
+        }
       });
     });
   });

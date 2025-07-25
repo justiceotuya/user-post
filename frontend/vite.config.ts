@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
         projects: ['./tsconfig.json'],
       }),
       tailwindcss(),
-      tanstackStart({ target: 'cloudflare-module' })
+      tanstackStart({ target: 'node-server' })
     ],
     resolve: {
       alias: {

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Backend Service with existing SQLite database
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: user-post-backend
+    ports:
+      - "5003:5003"
+    environment:
+      - NODE_ENV=production
+      - PORT=5003
+      - DATABASE_URL=file:/app/data/database.db
+      - DATABASE_PATH=/app/data/database.db
+      - CORS_ORIGIN=http://localhost:3000
+    volumes:
+      # Mount your existing database
+      - ./backend/data.db:/app/data/database.db
+      # Or use a volume if you prefer
+      # - sqlite_data:/app/data
+    networks:
+      - user-post-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -f /app/data/database.db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: user-post-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://backend:5003
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - user-post-network
+
+networks:
+  user-post-network:
+    driver: bridge
+
+# Only if you want to use a volume instead of direct file mount
+volumes:
+  sqlite_data:
+    driver: local
+    name: user-post-sqlite-data
