@@ -6,7 +6,7 @@ let db: Database;
 
 export const connectToDatabase = (): Promise<Database> => {
   return new Promise((resolve, reject) => {
-    const dbPath = process.env.DATABASE_PATH || './data/database.db';
+    const dbPath = process.env.DATABASE_PATH || './var/data/data.db';
     const absolutePath = path.resolve(dbPath);
 
     console.log(`🔌 Connecting to existing database at: ${absolutePath}`);
