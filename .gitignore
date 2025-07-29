@@ -124,6 +124,6 @@ $RECYCLE.BIN/
 
 
 # Package manager lock files (keep only one type)
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
