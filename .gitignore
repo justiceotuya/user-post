@@ -121,10 +121,7 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Local database files
-*.db
-*.sqlite
-*.sqlite3
+
 
 # Package manager lock files (keep only one type)
 package-lock.json
