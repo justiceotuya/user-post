@@ -34,7 +34,8 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S frontend -u 1001 -G nodejs
 
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json ./
+COPY package-lock.jso[n] ./
 
 # Install only production dependencies
 RUN npm ci --omit=dev && npm cache clean --force
