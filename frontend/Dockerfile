@@ -17,6 +17,15 @@ RUN npm ci
 # Copy source code and configuration files
 COPY . .
 
+# Set build-time environment variables
+ARG VITE_API_URL=http://localhost:5003
+ARG VITE_API_PREFIX=/api
+ARG VITE_DEPLOY_URL=http://localhost:3000
+
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_API_PREFIX=$VITE_API_PREFIX
+ENV VITE_DEPLOY_URL=$VITE_DEPLOY_URL
+
 # Build the application
 RUN npm run build
 
