@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs (will be created during build)
+.output
+.nitro
+.nuxt
+dist
+build
+
+# Development files
+.env.local
+.env.development
+.env.test
+.env*.local
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Other
+README.md
+*.md
+.tanstack
+coverage
+.nyc_output
+
+# Test files
+__tests__
+*.test.*
+*.spec.*
+vitest.config.*
