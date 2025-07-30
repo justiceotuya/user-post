@@ -43,7 +43,7 @@ export type PostType = {
 }
 
 export type PostsResponse = {
-  posts: PostType[]
+  data: PostType[]
   pagination: TPagination
 }
 
