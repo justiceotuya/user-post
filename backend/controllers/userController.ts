@@ -44,8 +44,6 @@ export class UserController {
       const { userId } = req.params;
 
         const user = await this.userModel.getById(userId);
-        console.log("USER", user);
-
 
       if (!user) {
         res.status(404).json({ error: 'User not found' });
@@ -126,14 +124,9 @@ export class UserController {
   async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const userIdNumber: number = parseInt(userId);
 
-      if (isNaN(userIdNumber)) {
-        res.status(400).json({ error: 'Invalid user ID' });
-        return;
-      }
 
-      const result = await this.userModel.delete(userIdNumber);
+      const result = await this.userModel.delete(userId);
 
       if (result.deleted === 0) {
         res.status(404).json({ error: 'User not found' });

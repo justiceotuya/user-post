@@ -56,3 +56,15 @@ export const useDeletePostMutation = () => {
                 }),
     });
 }
+
+export const useCreatePostMutation = () => {
+    return useMutation({
+        mutationFn: (data: { user_id: string, title: string, body: string }) =>
+            axios
+                .post(API_BASE + '/posts', data)
+                .then((r) => r.data)
+                .catch(() => {
+                    throw new Error('Failed to create post')
+                }),
+    });
+}

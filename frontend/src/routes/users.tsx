@@ -1,4 +1,4 @@
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 
 import LoadingComponent from '@/components/loading-component'
 import Pagination from '@/components/paginations'
@@ -34,7 +34,7 @@ interface User {
 }
 
 export function UserComponent() {
-    const navigate = useNavigate();
+   const router = useRouter();
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -43,12 +43,15 @@ export function UserComponent() {
         pageSize
     }))
     const users = usersQuery.data?.users
-    console.log(usersQuery.data);
-
 
     const formatAddress = (address?: User['address']) => {
         if (!address) return 'N/A'
         return `${address.street}, ${address.state}, ${address.city}, ${address.zipcode}`
+    }
+
+    const handleNavigateToUserPosts = (userId: string) => {
+        console.log("Navigating to user posts for userId:", userId);
+        router.navigate({ to: `/users/${userId}/posts` })
     }
 
 
@@ -56,6 +59,8 @@ export function UserComponent() {
         <main>
             <div className='max-w-[855px] mx-auto mt-10 lg:mt-32 px-4'>
                 <h1 className="text-6xl font-medium text-gray-900 mb-6">Users</h1>
+
+
                 <div className='rounded-xl bg-white  mt-4 border border-gray-200'>
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -75,13 +80,14 @@ export function UserComponent() {
                                         role="button"
                                         aria-label={`View posts for ${user.name}`}
                                         className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer focus:outline-none focus:bg-gray-100"
-                                        onClick={() => navigate({ to: "/users/$userId/posts", params: { userId: user.id } })}
+                                        onClick={() => handleNavigateToUserPosts(user.id)}
                                         onKeyDown={e => {
                                             if (e.key === 'Enter' || e.key === ' ') {
-                                                navigate({ to: "/users/$userId/posts", params: { userId: user.id } });
+                                              handleNavigateToUserPosts(user.id);
                                             }
                                         }}
                                     >
+
                                         <td className="py-[26px] px-6 font-medium text-sm text-gray-600">{user.name}</td>
                                         <td className="py-[26px] px-6 text-sm text-gray-600">{user.email}</td>
                                         <td

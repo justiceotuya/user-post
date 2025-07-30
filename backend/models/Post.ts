@@ -134,7 +134,7 @@ export class PostModel {
 
             // Transform posts data
             const posts: Post[] = postsRows.map((row: PostRow) => ({
-              id: row.id.toString(),
+              id: row?.id?.toString() || "",
               title: row.title,
               body: row.body,
               created_at: row.created_at || new Date().toISOString(),
@@ -213,12 +213,14 @@ export class PostModel {
   async create(postData: PostData): Promise<CreatePostResult> {
     return new Promise((resolve, reject) => {
       const { user_id, title, body } = postData;
-      const query = 'INSERT INTO posts (user_id, title, body, created_at) VALUES (?, ?, ?, ?)';
       const created_at = new Date().toISOString();
+      const id = Date.now().toString(); // Generate id using new Date().getTime() stringified
 
-      this.db.run(query, [user_id, title, body, created_at], function(err: Error | null) {
+      const query = 'INSERT INTO posts (id, user_id, title, body, created_at) VALUES (?, ?, ?, ?, ?)';
+
+      this.db.run(query, [id, user_id, title, body, created_at], function(err: Error | null) {
         if (err) return reject(err);
-        resolve({ id: this.lastID, ...postData });
+        resolve({ id: Number(id), user_id, title, body });
       });
     });
   }

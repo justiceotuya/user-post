@@ -175,13 +175,28 @@ export class UserModel {
   }
 
   // Delete a user
-  async delete(id: number): Promise<DeleteResult> {
-    return new Promise((resolve, reject) => {
-      this.db.run('DELETE FROM users WHERE id = ?', [id], function(err: Error | null) {
-        if (err) return reject(err);
-        resolve({ deleted: this.changes });
+  async delete(id?: string): Promise<DeleteResult> {
+    if (id && id?.length > 0) {
+      return new Promise((resolve, reject) => {
+        this.db.run('DELETE FROM users WHERE id = ?', [id], function(err: Error | null) {
+          if (err) return reject(err);
+          resolve({ deleted: this.changes });
+        });
       });
-    });
+    } else {
+      // No id provided: delete the first user without an id (id IS NULL)
+      return new Promise((resolve, reject) => {
+        // Find the first user where id IS NULL
+        this.db.get('SELECT rowid FROM users WHERE id IS NULL LIMIT 1', [], (err: Error | null, row: { rowid: number } | undefined) => {
+          if (err) return reject(err);
+          if (!row) return resolve({ deleted: 0 });
+          this.db.run('DELETE FROM users WHERE rowid = ?', [row.rowid], function(err2: Error | null) {
+            if (err2) return reject(err2);
+            resolve({ deleted: this.changes });
+          });
+        });
+      });
+    }
   }
 }
 

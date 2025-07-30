@@ -43,7 +43,6 @@ function UserPostsComponent() {
         userId,
     }))
 
-    console.log(postsQuery.data);
 
     const posts = postsQuery.data?.data.posts
     const user = postsQuery.data?.data.user
@@ -105,7 +104,7 @@ function UserPostsComponent() {
                         <ul
                             className="grid gap-[23px] grid-cols-[repeat(auto-fill,minmax(270px,1fr))]"
                         >
-                            {currentPage === 1 && <NewPostCard />}
+                            {currentPage === 1 && <NewPostCard userId={userId} />}
                             {posts.map((post) => {
                                 return (
                                     <PostCard key={post.id} {...post} handleDeletePost={handleDeletePost} />
