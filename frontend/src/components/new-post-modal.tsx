@@ -36,8 +36,8 @@ export function NewPostModal() {
             body: data.postContent,
             user_id:userId,
         }
-        console.log(postData)
-          toast.promise(
+
+        toast.promise(
             new Promise<void>((resolve, reject) => {
                 createPost(postData, {
                     onSuccess: () => {

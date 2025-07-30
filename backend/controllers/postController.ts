@@ -1,4 +1,4 @@
-import { PostData, PostModel } from '../models/Post';
+import { PostData, PostModel } from '../models/Post.js';
 import { Request, Response } from 'express';
 
 import { Database } from 'sqlite3';

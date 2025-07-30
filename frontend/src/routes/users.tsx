@@ -50,7 +50,6 @@ export function UserComponent() {
     }
 
     const handleNavigateToUserPosts = (userId: string) => {
-        console.log("Navigating to user posts for userId:", userId);
         router.navigate({ to: `/users/${userId}/posts` })
     }
 

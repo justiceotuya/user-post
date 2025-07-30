@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -26,7 +26,7 @@
     "moduleDetection": "force"
   },
   "include": ["**/*.ts", "**/*.js"],
-  "exclude": ["node_modules", "dist"],
+  "exclude": ["node_modules", "dist", "types"],
   "ts-node": {
     "esm": true
   }

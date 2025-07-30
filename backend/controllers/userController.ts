@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserData, UserModel } from '../models/User';
+import { UserData, UserModel } from '../models/User.js';
 
 import { Database } from 'sqlite3';
 

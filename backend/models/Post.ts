@@ -1,4 +1,4 @@
-import { PaginationResult, paginateQuery } from '../utils/pagination';
+import { PaginationResult, paginateQuery } from '../utils/pagination.js';
 
 import { Database } from 'sqlite3';
 

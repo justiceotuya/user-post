@@ -100,7 +100,6 @@ describe('UserModel', () => {
       const userId = (await createTestUser({ name: 'Test User', email: 'test@example.com'})).id;
 
       const user = await userModel.getById(userId);
-console.log({user, userId});
 
       expect(user).not.toBeNull();
       expect(user!.id).toBe(userId);

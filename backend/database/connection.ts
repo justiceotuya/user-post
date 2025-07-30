@@ -1,3 +1,85 @@
+// import sqlite3, { Database } from 'sqlite3';
+// import { join, dirname } from 'path';
+// import { fileURLToPath } from 'url';
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
+
+// let db: Database | null = null;
+
+// export const connectToDatabase = async (): Promise<Database> => {
+//   return new Promise((resolve, reject) => {
+//     const dbPath = join(__dirname, '../data.db');
+//     db = new sqlite3.Database(dbPath, (err) => {
+//       if (err) {
+//         reject(err);
+//       } else {
+//         console.log('Connected to SQLite database');
+//         resolve(db!);
+//       }
+//     });
+//   });
+// };
+
+// export const getDatabase = (): Database => {
+//   if (!db) {
+//     throw new Error('Database not connected. Call connectToDatabase() first.');
+//   }
+//   return db;
+// };
+
+// export const getDatabaseInfo = async (database: Database): Promise<{
+//   version: string;
+//   tables: string[];
+//   userCount?: number;
+// }> => {
+//   return new Promise((resolve, reject) => {
+//     // Get SQLite version
+//     database.get('SELECT sqlite_version() as version', (err, versionRow: any) => {
+//       if (err) {
+//         reject(err);
+//         return;
+//       }
+
+//       // Get table names
+//       database.all(
+//         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+//         (err, tableRows: any[]) => {
+//           if (err) {
+//             reject(err);
+//             return;
+//           }
+
+//           const tables = tableRows.map(row => row.name);
+
+//           // Get user count if users table exists
+//           if (tables.includes('users')) {
+//             database.get('SELECT COUNT(*) as count FROM users', (err, countRow: any) => {
+//               if (err) {
+//                 resolve({
+//                   version: versionRow.version,
+//                   tables: tables
+//                 });
+//               } else {
+//                 resolve({
+//                   version: versionRow.version,
+//                   tables: tables,
+//                   userCount: countRow.count
+//                 });
+//               }
+//             });
+//           } else {
+//             resolve({
+//               version: versionRow.version,
+//               tables: tables
+//             });
+//           }
+//         }
+//       );
+//     });
+//   });
+// };
+
 import sqlite3, { Database } from 'sqlite3';
 
 import path from 'path';
