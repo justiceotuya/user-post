@@ -79,7 +79,7 @@ export function NewPostModal() {
                 }
             }}
         >
-            <div className="bg-gray-100 dark:bg-gray-800  rounded-lg w-[95vw] max-w-[697px] p-6 shadow-2xl">
+            <div className="bg-gray-100   rounded-lg w-[95vw] max-w-[697px] p-6 shadow-2xl">
                 <p className='text-gray-900 text-4xl font-medium mb-6'>New Post</p>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 

@@ -1,8 +1,8 @@
 import express, { Router } from 'express';
 
 import { Database } from 'sqlite3';
-import { PostController } from '../controllers/postController.js';
-import { UserController } from '../controllers/userController.js';
+import { PostController } from '../controllers/postController';
+import { UserController } from '../controllers/userController';
 
 export function createRoutes(db: Database): Router {
   const router: Router = express.Router();

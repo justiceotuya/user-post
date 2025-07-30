@@ -1,9 +1,9 @@
-import { connectToDatabase, getDatabase, getDatabaseInfo } from './database/connection.js';
+import { connectToDatabase, getDatabase, getDatabaseInfo } from './database/connection';
 import express, { Application, NextFunction, Request, Response } from 'express';
 
-import config from './config/env.js';
+import config from './config/env';
 import cors from 'cors';
-import { createRoutes } from './routes/index.js';
+import { createRoutes } from './routes';
 import dotenv from 'dotenv';
 import { resolve } from 'path';
 

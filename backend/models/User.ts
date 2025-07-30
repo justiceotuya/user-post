@@ -1,8 +1,8 @@
-import { PaginationResult, paginateQuery } from '../utils/pagination.js';
+import { PaginationResult, paginateQuery } from '../utils/pagination';
 
 import { Database } from 'sqlite3';
 
-export interface Address {
+export interface Addresses {
   street: string;
   state: string;
   city: string;
@@ -17,16 +17,16 @@ export interface UserData {
 }
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   username: string;
   email: string;
   phone?: string;
-  addresses?: Address | null;
+  addresses?: Addresses | null;
 }
 
 export interface CreateUserResult {
-  id: number;
+  id: string;
   name: string;
   username: string;
   email: string;
@@ -42,7 +42,7 @@ export interface DeleteResult {
 }
 
 interface UserRow {
-  id: number;
+  id: string;
   name: string;
   username: string;
   email: string;
@@ -103,7 +103,7 @@ export class UserModel {
       }
     });
 
-    return await paginateQuery<User>(this.db, countQuery, dataQuery, [], [], page, limit, userTransformer, 'users');
+    return await paginateQuery<User>(this.db, countQuery, dataQuery, [], [], page, limit, userTransformer);
   }
 
   // Get user by ID
@@ -156,13 +156,14 @@ export class UserModel {
 
       this.db.run(query, [name, username, email, phone], function(err: Error | null) {
         if (err) return reject(err);
-        resolve({ id: this.lastID, ...userData });
+
+        resolve({ id: Date.now().toString(), ...userData });
       });
     });
   }
 
   // Update a user
-  async update(id: number, userData: Partial<UserData>): Promise<UpdateResult> {
+  async update(id: string, userData: Partial<UserData>): Promise<UpdateResult> {
     return new Promise((resolve, reject) => {
       const { name, username, email, phone } = userData;
       const query = 'UPDATE users SET name = ?, username = ?, email = ?, phone = ? WHERE id = ?';
@@ -176,7 +177,7 @@ export class UserModel {
 
   // Delete a user
   async delete(id?: string): Promise<DeleteResult> {
-    if (id && id?.length > 0) {
+    if (id) {
       return new Promise((resolve, reject) => {
         this.db.run('DELETE FROM users WHERE id = ?', [id], function(err: Error | null) {
           if (err) return reject(err);

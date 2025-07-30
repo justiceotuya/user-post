@@ -83,7 +83,6 @@ export function paginateQuery<T>(
   page: number = 1,
   limit: number = 10,
     dataTransformer?: (row: any) => T,
-  dataName?:string
 ): Promise<PaginationResult<T>> {
   return new Promise((resolve, reject) => {
     // First get the total count
@@ -107,12 +106,10 @@ export function paginateQuery<T>(
         pagination.metadata.itemsOnCurrentPage = data.length;
           pagination.metadata.endIndex = pagination.metadata.offset + data.length;
 
-        let result:any = {}
-
-          const nameOfData = dataName || 'data';
-           result[nameOfData] = data || []
-           result.pagination = pagination.metadata
-
+        const result: PaginationResult<T> = {
+          data: data,
+          pagination: pagination.metadata
+        };
 
         resolve(result);
       });

@@ -29,7 +29,7 @@ export type UserWithAddress = User & {
 }
 
 export type UsersResponse = {
-  users: UserWithAddress[]
+  data: UserWithAddress[]
   pagination: TPagination
 }
 

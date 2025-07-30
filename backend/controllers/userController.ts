@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserData, UserModel } from '../models/User.js';
+import { UserData, UserModel } from '../models/User';
 
 import { Database } from 'sqlite3';
 
@@ -89,13 +89,8 @@ export class UserController {
   async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const userIdNumber: number = parseInt(userId);
       const userData: Partial<UserData> = req.body;
 
-      if (isNaN(userIdNumber)) {
-        res.status(400).json({ error: 'Invalid user ID' });
-        return;
-      }
 
       // Validate email format if provided
       if (userData.email) {
@@ -106,7 +101,7 @@ export class UserController {
         }
       }
 
-      const result = await this.userModel.update(userIdNumber, userData);
+      const result = await this.userModel.update(userId, userData);
 
       if (result.changes === 0) {
         res.status(404).json({ error: 'User not found' });

@@ -42,7 +42,7 @@ export function UserComponent() {
         currentPage,
         pageSize
     }))
-    const users = usersQuery.data?.users
+    const users = usersQuery.data?.data
 
     const formatAddress = (address?: User['address']) => {
         if (!address) return 'N/A'

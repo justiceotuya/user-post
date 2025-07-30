@@ -7,19 +7,27 @@
 		"build": "tsc",
 		"dev": "tsx watch server.ts",
 		"start": "node dist/server.js",
-		"type-check": "tsc --noEmit"
+		"type-check": "tsc --noEmit",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest --coverage",
+		"test:ui": "vitest --ui",
+		"test:watch": "vitest --watch"
 	},
 	"dependencies": {
 		"cors": "^2.8.5",
 		"dotenv": "^16.6.1",
 		"express": "^4.19.2",
-		"sqlite3": "^5.1.6"
+		"sqlite3": "^5.1.6",
+		"supertest": "^7.1.4",
+		"vitest": "^3.2.4"
 	},
 	"devDependencies": {
 		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.23",
 		"@types/node": "^20.11.24",
 		"@types/sqlite3": "^3.1.11",
+		"@types/supertest": "^6.0.3",
 		"tsx": "^4.7.1",
 		"typescript": "^5.3.3"
 	}

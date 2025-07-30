@@ -1,9 +1,9 @@
-import { PaginationResult, paginateQuery } from '../utils/pagination.js';
+import { PaginationResult, paginateQuery } from '../utils/pagination';
 
 import { Database } from 'sqlite3';
 
 export interface PostData {
-  user_id: number;
+  user_id: string;
   title: string;
   body: string;
 }
@@ -29,8 +29,8 @@ export interface UserPostsResult {
 }
 
 export interface CreatePostResult {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   title: string;
   body: string;
 }
@@ -44,8 +44,8 @@ export interface DeleteResult {
 }
 
 interface PostRow {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   title: string;
   body: string;
   created_at: string;
@@ -87,7 +87,7 @@ export class PostModel {
       email: row.email || 'unknown@example.com'
     });
 
-    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit, postTransformer, 'posts');
+    return await paginateQuery<Post>(this.db, countQuery, dataQuery, [], [], page, limit, postTransformer);
   }
 
   // Get posts by user ID with user data and pagination - Returns custom format
@@ -99,7 +99,12 @@ export class PostModel {
 
       this.db.get(userQuery, [userId], (userErr: Error | null, userRow: { name: string; email: string }) => {
         if (userErr) return reject(userErr);
-        if (!userRow) return reject(new Error('User not found'));
+        if (!userRow) {
+          // Attach a statusCode property to the error for custom error handling in your route/controller
+          const notFoundError = new Error('User not found');
+          (notFoundError as any).statusCode = 404;
+          return reject(notFoundError);
+        }
 
         // Then get paginated posts
         const countQuery = 'SELECT COUNT(*) as total FROM posts WHERE user_id = ?';
@@ -176,7 +181,7 @@ export class PostModel {
   }
 
   // Get post by ID with user data
-  async getById(id: number): Promise<Post | null> {
+  async getById(id: string): Promise<Post | null> {
     return new Promise((resolve, reject) => {
       const query = `
         SELECT
@@ -216,17 +221,24 @@ export class PostModel {
       const created_at = new Date().toISOString();
       const id = Date.now().toString(); // Generate id using new Date().getTime() stringified
 
+      //validate the user_id by checking if the user exists
+      this.db.get('SELECT id FROM users WHERE id = ?', [user_id], (err: Error | null, row: { id: string } | undefined) => {
+        if (err) return reject(err);
+        if (!row) return reject(new Error('User not found'));
+      });
+
+
       const query = 'INSERT INTO posts (id, user_id, title, body, created_at) VALUES (?, ?, ?, ?, ?)';
 
       this.db.run(query, [id, user_id, title, body, created_at], function(err: Error | null) {
         if (err) return reject(err);
-        resolve({ id: Number(id), user_id, title, body });
+        resolve({ id, user_id, title, body });
       });
     });
   }
 
   // Update a post
-  async update(id: number, postData: Partial<Pick<PostData, 'title' | 'body'>>): Promise<UpdateResult> {
+  async update(id: string, postData: Partial<Pick<PostData, 'title' | 'body'>>): Promise<UpdateResult> {
     return new Promise((resolve, reject) => {
       const { title, body } = postData;
       const query = 'UPDATE posts SET title = ?, body = ? WHERE id = ?';

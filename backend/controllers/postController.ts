@@ -1,4 +1,4 @@
-import { PostData, PostModel } from '../models/Post.js';
+import { PostData, PostModel } from '../models/Post';
 import { Request, Response } from 'express';
 
 import { Database } from 'sqlite3';
@@ -34,8 +34,22 @@ export class PostController {
       const result = await this.postModel.getByUserId(userId, page, limit);
       res.json(result);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      res.status(500).json({ error: errorMessage });
+      let errorMessage = 'Unknown error occurred';
+      let errorStatus = 500;
+      if (error instanceof Error) {
+       errorMessage =  error.message
+      } else {
+        errorMessage =  "Unknown error"
+      }
+      if (typeof error === 'object' && error !== null && 'statusCode' in error) {
+        // @ts-ignore
+        errorStatus = parseInt( error.statusCode);
+      } else {
+        errorStatus = 500
+      }
+
+
+      res.status(errorStatus).json({ error: errorMessage });
     }
   }
 
@@ -43,14 +57,7 @@ export class PostController {
   async getPostById(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
-      const postIdNumber: number = parseInt(postId);
-
-      if (isNaN(postIdNumber)) {
-        res.status(400).json({ error: 'Invalid post ID' });
-        return;
-      }
-
-      const post = await this.postModel.getById(postIdNumber);
+      const post = await this.postModel.getById(postId);
 
       if (!post) {
         res.status(404).json({ error: 'Post not found' });
@@ -89,14 +96,7 @@ export class PostController {
   async updatePost(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
-      const postIdNumber: number = parseInt(postId);
       const postData: Partial<Pick<PostData, 'title' | 'body'>> = req.body;
-
-      if (isNaN(postIdNumber)) {
-        res.status(400).json({ error: 'Invalid post ID' });
-        return;
-      }
-
       // Validate that at least one field is provided for update
       if (!postData.title && !postData.body) {
         res.status(400).json({
@@ -105,8 +105,7 @@ export class PostController {
         return;
       }
 
-      const result = await this.postModel.update(postIdNumber, postData);
-
+      const result = await this.postModel.update(postId, postData);
       if (result.changes === 0) {
         res.status(404).json({ error: 'Post not found' });
         return;
